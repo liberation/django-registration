@@ -249,9 +249,13 @@ class RegistrationProfile(models.Model):
             not). Consult the documentation for the Django sites
             framework for details regarding these objects' interfaces.
 
+        ``user``
+            The User object associated with the RegistrationProfile.
+            
         """
         ctx_dict = {'activation_key': self.activation_key,
                     'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                    'user': self.user,
                     'site': site}
         subject = render_to_string('registration/activation_email_subject.txt',
                                    ctx_dict)

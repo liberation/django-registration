@@ -14,6 +14,13 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 
+# I put this on all required fields, because it's easier to pick up
+# on them with CSS or JavaScript if they have a class of "required"
+# in the HTML. Your mileage may vary. If/when Django ticket #3515
+# lands in trunk, this will no longer be necessary.
+attrs_dict = {'class': 'required'}
+
+
 class RegistrationForm(forms.Form):
     """
     Form for registering a new user account.
@@ -33,8 +40,10 @@ class RegistrationForm(forms.Form):
                                 max_length=30,
                                 label=_("Username"),
                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    email = forms.EmailField(label=_("E-mail"))
-    password1 = forms.CharField(widget=forms.PasswordInput,
+    email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
+                                                               maxlength=75)),
+                             label=_("Email address"))
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password"))
     password2 = forms.CharField(widget=forms.PasswordInput,
                                 label=_("Password (again)"))
