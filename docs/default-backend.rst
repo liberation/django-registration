@@ -32,6 +32,10 @@ This backend makes use of the following settings:
     is optional, and a default of ``True`` will be assumed if it is
     not supplied.
 
+``ACCOUNT_ACTIVATION_EMAIL_BCC``
+   A list of tuples containing the name and address of the people
+   who should receive a copy of every activation mail sent. 
+
 By default, this backend uses
 :class:`registration.forms.RegistrationForm` as its form class for
 user registration; this can be overridden by passing the keyword

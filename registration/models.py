@@ -9,6 +9,7 @@ from django.db import models
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+from django.core.mail import EmailMessage
 
 try:
     from django.utils.timezone import now as datetime_now
@@ -216,7 +217,7 @@ class RegistrationProfile(models.Model):
         """
         Send an activation email to the user associated with this
         ``RegistrationProfile``.
-        
+
         The activation email will make use of two templates:
 
         ``registration/activation_email_subject.txt``
@@ -251,7 +252,7 @@ class RegistrationProfile(models.Model):
 
         ``user``
             The User object associated with the RegistrationProfile.
-            
+
         """
         ctx_dict = {'activation_key': self.activation_key,
                     'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
@@ -261,9 +262,9 @@ class RegistrationProfile(models.Model):
                                    ctx_dict)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        
+
         message = render_to_string('registration/activation_email.txt',
                                    ctx_dict)
-        
-        self.user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    
+
+        bcced = [email for nick, email in getattr(settings, 'ACCOUNT_ACTIVATION_EMAIL_BCC', [])]
+        EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email,], [bcced]).send()
