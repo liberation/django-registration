@@ -267,4 +267,4 @@ class RegistrationProfile(models.Model):
                                    ctx_dict)
 
         bcced = [email for nick, email in getattr(settings, 'ACCOUNT_ACTIVATION_EMAIL_BCC', [])]
-        EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email,], [bcced]).send()
+        EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email,], bcced).send()

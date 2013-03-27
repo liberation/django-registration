@@ -8,6 +8,7 @@ from django.core import mail
 from django.core import management
 from django.test import TestCase
 from django.utils.hashcompat import sha_constructor
+from django.test.utils import override_settings
 
 from registration.models import RegistrationProfile
 
@@ -55,6 +56,22 @@ class RegistrationModelTests(TestCase):
         profile.send_activation_email(Site.objects.get_current())
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [self.user_info['email']])
+
+    def _test_activation_bcc(self):
+        new_user = User.objects.create_user(**self.user_info)
+        profile = RegistrationProfile.objects.create_profile(new_user)
+        profile.send_activation_email(Site.objects.get_current())
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(ACCOUNT_ACTIVATION_EMAIL_BCC=[])
+    def test_activation_bcc_none(self):
+        self._test_activation_bcc()
+        self.assertEqual(mail.outbox[0].bcc, [])
+
+    @override_settings(ACCOUNT_ACTIVATION_EMAIL_BCC=[('test 1', 'test@test.com'), ('test 2', 'test2@test.com')])
+    def test_activation_bcc_some(self):
+        self._test_activation_bcc()
+        self.assertEqual(mail.outbox[0].bcc, ['test@test.com', 'test2@test.com'])
 
     def test_user_creation(self):
         """
